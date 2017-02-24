@@ -15,11 +15,18 @@ class PostsControllerTest < ActionController::TestCase
     assert_equal Post.count, jdata['meta']['total-count']
   end
 
-  test "Should get properly sorted list" do
+  test 'Should get properly sorted list' do
     post = Post.order('rating DESC').first
     get :index, params: { sort: '-rating' }
     assert_response :success
     jdata = JSON.parse response.body
     assert_equal post.title, jdata['data'][0]['attributes']['title']
+  end
+
+  test 'Should get filtered list' do
+    get :index, params: { filter: 'First' }
+    assert_response :success
+    jdata = JSON.parse response.body
+    assert_equal Post.where(category: 'First').count, jdata['data'].length
   end
 end
